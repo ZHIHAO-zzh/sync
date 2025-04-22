@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - 约搭子</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layui.css') }}">
+    <style>
+
+    </style>
+</head>
+<script src="{{ url_for('static', filename='js/layui.js') }}"></script>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div  class="header flex1">
+        <ul class="layui-nav" lay-filter="">
+                <li class="layui-nav-item"><a href="{{ url_for('index') }}">最新活动</a></li>
+                {% if current_user.is_authenticated %}
+                <li class="layui-nav-item "><a href="/relationship">好友列表</a></li>
+                <li class="layui-nav-item "><a href="{{ url_for('group_list') }}">群聊列表</a></li>
+                <li class="layui-nav-item">
+                    <a href="/accept_friend_request">新炮友
+                        {% if new != 0 %}
+                        <span class="layui-badge">{{ new }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li class="layui-nav-item"><a href="{{ url_for('activity_create') }}">创建活动</a></li>
+                <li class="layui-nav-item"><a href="{{ url_for('activity_manage') }}">活动管理</a></li>
+                <li class="layui-nav-item">
+                    <a href="javascript:">个人中心</a>
+                    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                        <dd><a href="{{ url_for('profile') }}">编辑个人信息</a></dd>
+                        <dd><a href="">查看评价</a></dd>
+                        <dd><a href="{{ url_for('logout') }}">退出</a></dd>
+                    </dl>
+                </li>
+                {% else %}
+                <li class="layui-nav-item "><a href="{{ url_for('login') }}">登录</a></li>
+                <li class="layui-nav-item "><a href="{{ url_for('register') }}">注册</a></li>
+                {% endif %}
+
+        </ul>
+
+    </div>
+    <div class="flex main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% if 'chat' in request.endpoint %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    {% endif %}
+</body>
+<script>
+    // 使用 JavaScript 控制 flash 消息的消失时间
+    const flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(message => {
+        setTimeout(() => {
+            message.style.display = 'none';
+        }, 5000); // 5000 毫秒即 5 秒后消失
+    });
+</script>
+</html>

@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+    <body class="flex1">
+    <div id="sidebar" style="width: 200px; z-index: 1" class="baise mgr8 mgt8">
+        <div style="
+                    padding: 10px;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: 1px solid #999;
+
+                " class="flex">
+            <!-- 名称 -->
+            {% if current_user.is_authenticated %}
+                <!-- 头像 -->
+                <img
+                        src="{{ current_user.c_avatar_URL }}"
+                        width="40px"
+                        height="40px"
+                        alt=""
+                />
+                <div style="margin-left: 10px">{{ current_user.c_usename }}</div>
+            {% else %}
+                <div style="margin-left: 10px">未登录</div>
+            {% endif %}
+        </div>
+        <div class="flex1 mgt8" style="position: relative">
+            {% if current_user.is_authenticated %}
+                <h2>最近聊天</h2>
+                <ul id="recent-chats">
+                    {% for chat in recent_chats %}
+                        {% if chat.activity.a_id !='0' %}
+                            <li data-activity-id="{{ chat.activity.a_id }}"
+                                data-conversation-id="{{ chat.conversation_id }}">
+
+                                <a href="{{ url_for('chat', conversation_id=chat.conversation_id) }}">{{ chat.activity.a_name }}
+                                    -临时对话- {{ chat.other_user.c_usename }}</a>
+                                - 最后消息:
+                                {% if chat.last_message %}
+                                    <span class="timestamp">{{ chat.local_timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                                {% else %}
+                                    无消息
+                                {% endif %}
+                            </li>
+                        {% else %}
+                            <li data-activity-id="{{ chat.activity.a_id }}"
+                                data-conversation-id="{{ chat.conversation_id }}">
+
+                                <a href="{{ url_for('chat', conversation_id=chat.conversation_id) }}">好友
+                                    - {{ chat.other_user.c_usename }}</a>
+                                - 最后消息:
+                                {% if chat.last_message %}
+                                    <span class="timestamp">{{ chat.local_timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                                {% else %}
+                                    无消息
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li>暂无聊天</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div style="position: absolute">登录查看最近聊天</div>
+            {% endif %}
+        </div>
+
+    </div>
+    <div class="flex1 flex column">
+
+        <!-- 内容区 -->
+        <div style="overflow: auto" class="flex1 flex">
+            <!-- 左区 -->
+            <div style="flex: 3" class="flex column  mgr8">
+
+                <div class="flex column">
+                    {% if not activities %}
+                    <div style="margin-left: 500px;margin-top: 200px">未搜索到结果</div>
+
+                    {% endif %}
+                    {% for activity in activities %}
+                        {% if activity.a_id !='0' %}
+                            <div style="height: 160px;position: relative;" class="baise mgt8"
+                                 data-id="{{ activity.id }}">
+
+                                <a style="font-size: 24px; margin: 0;"
+                                   href="{{ url_for('activity_detail', a_id=activity.a_id) }}">{{ activity.a_name }}</a>
+                                <div style="position: absolute;top: 40px;">{{ activity.a_text }}</div>
+                                <div style="position: absolute;top: 140px;">
+                                    {% for tag in activity_tags  %}
+                                        {% if activity.a_id == tag.a_id %}
+                                        {{ tag.tag.tag_name }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div style="position: absolute; bottom: 10px; right: 10px; font-size: 14px;">
+                                    创建者：{{ activity.creator.c_usename }}
+                                    - {{ activity.event_time.strftime('%Y-%m-%d %H:%M') }}
+                                    {% if activity.end_time %}
+                                        至 {{ activity.end_time.strftime('%Y-%m-%d %H:%M') }}
+                                    {% endif %}
+                                </div>
+
+
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 右区 -->
+            <div id="right-area" style="flex: 1" class="flex column mgr8 mgt8">
+                <!-- 搜索栏 -->
+                <div style="height: 150px" class="baise layui-form">
+                    <form method="GET" action="{{ url_for('index') }}">
+                        <div style="display: flex; align-items: center;">
+                            <i class="layui-icon layui-icon-search" style="font-size: 30px; margin-right: 5px;"></i>
+                            <input type="text" name="search" value="{{ search }}" class="layui-input"
+                                   placeholder="搜索活动">
+                        </div>
+                        <div class=" layui-form-item">
+
+
+                            <select name="sort">
+                                <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>按创建时间
+                                </option>
+                                <option value="event_time" {% if sort == 'event_time' %}selected{% endif %}>按活动时间
+                                </option>
+                            </select>
+
+
+                        </div>
+
+                        <button type="submit" class="layui-btn layui-btn-normal">搜索</button>
+                    </form>
+                </div>
+                <!-- 消息区 -->
+                <div style="height: 300px" class="baise mgt8"></div>
+            </div>
+        </div>
+    </div>
+    </body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    <script>
+        layui.use('form', function () {
+            var form = layui.form;
+        });
+    </script>
+    <script>
+        const socket = io('http://' + document.domain + ':' + location.port, {
+            transports: ['websocket']
+        });
+
+        socket.on('connect', () => {
+            console.log('Connected to SocketIO server');
+        });
+
+        socket.on('new_activity', (data) => {
+            console.log('New activity:', data);
+            const activityList = document.getElementById('activity-list');
+            if (activityList.querySelector('li').textContent === '暂无活动') {
+                activityList.innerHTML = '';
+            }
+            const li = document.createElement('li');
+            li.setAttribute('data-id', data.id);
+            li.innerHTML = `<a href="/activity/${data.id}">${data.title}</a> - ${data.creator} - ${data.event_time}` +
+                (data.end_time ? ` 至 ${data.end_time}` : '');
+            activityList.insertBefore(li, activityList.firstChild);
+        });
+
+        socket.on('delete_activity', (data) => {
+            console.log('Delete activity:', data);
+            const activityList = document.getElementById('activity-list');
+            const li = activityList.querySelector(`li[data-id="${data.id}"]`);
+            if (li) {
+                li.remove();
+            }
+            if (!activityList.querySelector('li')) {
+                activityList.innerHTML = '<li>暂无活动</li>';
+            }
+            const recentChats = document.getElementById('recent-chats');
+            const chatLi = recentChats.querySelector(`li[data-activity-id="${data.id}"]`);
+            if (chatLi) {
+                chatLi.remove();
+            }
+            if (!recentChats.querySelector('li')) {
+                recentChats.innerHTML = '<li>暂无聊天</li>';
+            }
+        });
+
+        socket.on('new_chat_message', (data) => {
+            console.log('New chat message:', data);
+            const recentChats = document.getElementById('recent-chats');
+            let li = recentChats.querySelector(`li[data-conversation-id="${data.conversation_id}"]`);
+            if (li) {
+                li.querySelector('.timestamp').textContent = data.timestamp;
+                recentChats.insertBefore(li, recentChats.firstChild);
+            } else {
+                if (recentChats.querySelector('li').textContent === '暂无聊天') {
+                    recentChats.innerHTML = '';
+                }
+                li = document.createElement('li');
+                li.setAttribute('data-activity-id', data.activity_id);
+                li.setAttribute('data-conversation-id', data.conversation_id);
+                li.innerHTML = `<a href="/chat/${data.conversation_id}">${data.activity_title} - ${data.other_user}</a> - 最后消息: <span class="timestamp">${data.timestamp}</span>`;
+                recentChats.insertBefore(li, recentChats.firstChild);
+            }
+        });
+    </script>
+{% endblock %}

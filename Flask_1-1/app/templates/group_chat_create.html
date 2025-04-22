@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div style="height: 400px;width: 600px;margin: 100px auto ">
+        <h1>创建群聊</h1>
+        <form method="post" class="layui-form">
+            <label for="name" class="layui-form-label">群聊名称:</label>
+            <input type="text" id="name" name="name" class="layui-input" required>
+            <button type="submit" class="layui-btn" >创建</button>
+        </form>
+    </div>
+{% endblock %}

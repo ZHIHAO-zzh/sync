@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div style="height: 400px;width: 600px;margin: 30px auto ">
+        <h1>{{ activity.a_name }}</h1>
+        <p>标签：
+            {% for tag in activity_tags %}
+                {% if activity.a_id == tag.a_id %}
+                    {{ tag.tag.tag_name }}
+                {% endif %}
+            {% endfor %}
+        </p>
+        <p>{{ activity.a_text }}</p>
+        <p>活动时间: {{ to_local_time(activity.event_time).strftime('%Y-%m-%d %H:%M') }}
+            {% if activity.end_time %}
+                至 {{ to_local_time(activity.end_time).strftime('%Y-%m-%d %H:%M') }}
+            {% endif %}
+        </p>
+        <p>地点: {{ activity.a_location }}</p>
+        <p>最大参与人数: {{ activity.limit_p }}</p>
+
+        <!-- 调试用户信息 -->
+        {% if current_user.is_authenticated %}
+            <p>当前用户：{{ current_user.c_usename }} (ID: {{ current_user.c_id }})</p>
+        {% else %}
+            <p>用户未登录</p>
+        {% endif %}
+
+        <!-- 显示活动创建者 -->
+        <h2>活动创建者</h2>
+        <p>
+            {{ activity.creator.c_usename }} (ID: {{ activity.creator_c_id }})
+            {% if activity.creator_c_id == current_user.c_id %}(我){% endif %}
+            {% if current_user.is_authenticated and activity.creator_c_id != current_user.c_id %}
+                -<a class="layui-btn layui-btn-normal layui-btn-sm" href="#"
+                    onclick="startChat({{ activity.a_id }}, {{ activity.creator.c_id }}, '{{ activity.creator.c_usename }}')">与 {{ activity.creator.c_usename }}
+                聊一聊</a>
+            {% endif %}
+        </p>
+
+        <!-- 显示参与者 -->
+        <h2>参与者 ({{ participations|length }})</h2>
+        <ul>
+            {% for participation in participations %}
+                <li>
+                    {{ participation.participant.c_usename }} (ID: {{ participation.participant.c_id }})
+                    {% if participation.participant.c_id == current_user.c_id %}(我){% endif %}
+                    {% if current_user.is_authenticated and participation.participant.c_id != current_user.c_id %}
+                        -<a class="layui-btn layui-btn-normal layui-btn-xs" href="#"
+                            onclick="startChat({{ activity.a_id }}, {{ participation.participant.c_id }},
+                                    '{{ participation.participant.c_usename }}')">与 {{ participation.participant.c_usename }}
+                        聊一聊</a>
+                    {% endif %}
+                </li>
+            {% else %}
+                <li>暂无参与者</li>
+            {% endfor %}
+        </ul>
+        {% if current_user.is_authenticated %}
+            <a class="layui-btn" style=" font-size: 24px;" href="{{ url_for('activity_join', a_id=activity.a_id) }}">参与活动</a>
+        {% else %}
+            <p>请先登录以参与活动或发起聊天</p>
+            <a class="layui-btn" href="{{ url_for('login') }}">登录</a>
+        {% endif %}
+
+        <!-- 新增：活动评论栏 -->
+        <h2>活动评论</h2>
+        <div style="font-size: 24px;">活动评分：{{ average_rating }}</div>
+        {% if current_user.is_authenticated %}
+            <form id="comment-form" method="post" action="{{ url_for('add_comment', a_id=activity.a_id) }}">
+                <input type="hidden" id="activity-id" value="{{ activity.a_id }}">
+                <label for="rating">评分:</label>
+                <input type="number" id="rating" name="rating" min="1" max="5" required><br>
+                <label for="evaluation_content">评价内容:</label>
+                <textarea id="comment-content" name="comment-content" required rows="4" cols="50"></textarea><br>
+
+                <button type="submit" class="layui-btn">提交评价</button>
+            </form>
+
+
+        {% endif %}
+        <div id="comments">
+            {% for comment in comments %}
+                <div class="comment">
+                    <p><strong>
+                        {{ comment.user.c_usename }}</strong>
+                        {{ comment.rating }}分
+                        评论于 {{ to_local_time(comment.e_time).strftime('%Y-%m-%d %H:%M') }}
+                    </p>
+                    <p>{{ comment.evaluation_content }}</p>
+                </div>
+            {% else %}
+                <p>暂无评论</p>
+            {% endfor %}
+        </div>
+
+
+    </div>
+    <script>
+        function startChat(activityId, userId, username) {
+            {% if current_user.is_authenticated %}
+                const userIds = [{{ current_user.c_id }}, userId].sort((a, b) => a - b);
+                const conversationId = `${activityId}-${userIds[0]}-${userIds[1]}`;
+                window.location.href = `/chat/${conversationId}`;
+            {% else %}
+                alert('请先登录！');
+                window.location.href = '{{ url_for('login') }}';
+            {% endif %}
+        }
+
+        // 新增：处理评论提交
+        const socket = io('http://' + document.domain + ':' + location.port, {
+            transports: ['websocket']
+        });
+        socket.on('connect', () => {
+            console.log('Connected to SocketIO server');
+            socket.emit('join', {room: '{{ activity.a_id }}'});
+        });
+
+        socket.on('connect_error', (error) => {
+            console.log('Connection error:', error);
+        });
+
+        socket.on('send_comment', (data) => {
+            console.log('Received new comment:', data);
+            const messages = document.getElementById('comment');
+            const div = document.createElement('div');
+            // 使用本地时间格式化
+            const localTime = new Date(data.timestamp).toLocaleString('zh-CN', {
+                timeZone: 'Asia/Shanghai',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }).replace(/\//g, '-');
+            div.innerHTML = '<strong>' + data.receiver + ':</strong> ' + data.content +
+                '<span class="timestamp">' + localTime + '</span>';
+            messages.appendChild(div);
+        });
+
+        document.getElementById('comment-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('comment-content');
+            if (input.value) {
+                console.log('Sending comment:', input.value);
+                let messageData = {
+                    receiver: {{ current_user.c_usename }},
+                    content: input.value
+                };
+                // 检查 activity 是否存在
+                {% if activity %}
+                    messageData.activity_id = {{ activity.a_id }};
+                {% endif %}
+                socket.emit('send_comment', messageData);
+                input.value = '';
+            }
+        });
+
+        // 监听输入框的 keydown 事件
+        document.getElementById('comment-content').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const input = document.getElementById('comment-content');
+                if (input.value) {
+                    console.log('Sending comment:', input.value);
+                    let messageData = {
+                        receiver_id: {{ current_user.c_id }},
+                        content: input.value
+                    };
+                    // 检查 activity 是否存在
+                    {% if activity %}
+                        messageData.activity_id = {{ activity.a_id }};
+                    {% endif %}
+                    socket.emit('send_comment', messageData);
+                    input.value = '';
+                }
+            }
+        });
+    </script>
+{% endblock %}

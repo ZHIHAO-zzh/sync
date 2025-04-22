@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+	<div style="height: 400px;width: 600px;margin: 150px auto ">
+    {% if states == 0 %}
+        <h1>群聊列表</h1>
+    {% elif states == 1 %}
+        <h1>搜索新群聊</h1>
+    {% endif %}
+
+            <form method="GET" action="{{ url_for('group_list') }}" class="layui-form">
+                <div style="display: flex; align-items: center;">
+                    <i class="layui-icon layui-icon-search" style="font-size: 30px; margin-right: 5px;"></i>
+                    <input type="text" name="g_search" value="{{ search }}" class="layui-input"
+                           placeholder="搜索新群聊">
+                    <button type="submit" class="layui-btn layui-btn-normal">搜索</button>
+                </div>
+
+            </form>
+
+        <ul id="relationship">
+            {% for group in n_groups %}
+                <div style="height: 100px;position: relative;" class="baise mgt8">
+
+                    <div style="font-size: 24px;">
+                        {{ group.g_name }}(未加入)
+                    </div>
+                    <form method="POST" class="layui-form" action="{{ url_for('group_chat_join',g_id=group.g_id) }}">
+                        <input type="hidden" name="g_id" value="{{ group.g_id }}">
+                        <button type="submit" class="layui-btn layui-btn-normal">申请加入</button>
+                    </form>
+                </div>
+
+            {% endfor %}
+            {% for group in groups %}
+            <div style="height: 100px;position: relative;" class="baise mgt8">
+
+                <a style="font-size: 24px;" href={{ url_for('group_chat_detail',g_id=group.g_id)}}>
+                    {{ group.g_name }}(已加入)
+                </a>
+                <form method="POST" class="layui-form" action="{{ url_for('group_chat_leave',g_id=group.g_id) }}">
+                 <input type="hidden" name="delete" value={{ group.g_id  }}>
+                <button type="submit" style="margin-left: 450px;position: absolute" class="layui-btn layui-btn-danger">
+                    退出群聊</button>
+                </form>
+            </div>
+
+            {% endfor %}
+            {% if others is none and m_others is none and n_others is none %}
+            列表为空
+            {% endif %}
+            <form method="GET" action="{{ url_for('group_chat_create') }}" class="layui-form">
+                <div style="display: flex; align-items: center;">
+                    <button type="submit" class="layui-btn layui-btn-normal">创建群聊</button>
+                </div>
+
+            </form>
+        </ul>
+    </div>
+{% endblock %}

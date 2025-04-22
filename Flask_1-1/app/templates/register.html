@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div style="height: 400px;width: 600px;margin: 150px auto ">
+    <h1 style="text-align: center;margin-right: 60px ">注册</h1>
+    <form class="layui-form" method="POST" enctype="multipart/form-data" action="" >
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.c_usename.label(class="layui-form-label",style="width: 90px;") }}
+
+            {{ form.c_usename(size=32,class="layui-input",style="width: 300px;") }}
+
+            {% for error in form.c_usename.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+
+        <p>
+            <label class="layui-form-label" style="width: 90px;">{{ form.email.label }}</label>
+            <div class="layui-input-block">
+                {{ form.email(size=32,class="layui-input",style="width: 300px;") }}
+            </div>
+            {% for error in form.email.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+
+
+
+        <p>
+            {{ form.password.label(class="layui-form-label",style="width: 90px;") }}
+            {{ form.password(size=32,class="layui-input",style="width: 300px;") }}
+            {% for error in form.password.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p  style="display: flex; align-items: center;">
+            {{ form.password2.label(class="layui-form-label",style="width: 90px;") }}
+            {{ form.password2(size=32,class="layui-input",style="width: 300px;") }}
+            {% for error in form.password2.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.phonenumber.label(class="layui-form-label",style="width: 90px;") }}
+            {{ form.phonenumber(size=32,class="layui-input",style="width: 300px;") }}
+            {% for error in form.phonenumber.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.c_avatar.label }}
+            {{ form.c_avatar(onchange="previewImage(event)",accept="image/*") }}
+            <img id="avatar-preview" src="#" alt="Avatar Preview"  style="display: none; max-width: 100px; max-height: 100px;">
+            {% for error in form.c_avatar.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <div class="layui-input-block">
+            {{ form.submit(class="layui-btn") }}
+        </div>
+
+    </form>
+</div>
+
+<script>
+layui.use(['form', 'layer'], function(){
+    var form = layui.form;
+    var layer = layui.layer;
+});
+function previewImage(event) {
+    var input = event.target;
+    var reader = new FileReader();
+
+    reader.onload = function(){
+        var img = document.getElementById('avatar-preview');
+        img.src = reader.result;
+        img.style.display = 'block'; // 显示图片
+    }
+
+    if (input.files && input.files[0]) {
+        reader.readAsDataURL(input.files[0]);
+    }
+
+}
+</script>
+{% endblock %}

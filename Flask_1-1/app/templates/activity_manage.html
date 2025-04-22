@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div style="height: 400px;width: 600px;margin: 150px auto ">
+        <h1>活动管理</h1>
+        <h2>我创建的活动</h2>
+        <table class="layui-table">
+            <colgroup>
+                <col width="150">
+                <col width="200">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>活动名称</th>
+                <th>活动时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for activity in created_activities %}
+                <tr>
+                    <td>{{ activity.a_name }} </td>
+                    <td> {{ to_local_time(activity.event_time).strftime('%Y-%m-%d %H:%M') }}-
+                        {% if activity.end_time %}
+                            至 {{ to_local_time(activity.end_time).strftime('%Y-%m-%d %H:%M') }}
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ url_for('activity_edit', activity_id=activity.a_id) }}" class="layui-btn">编辑</a>
+                        <form method="POST" action="{{ url_for('activity_delete', activity_id=activity.a_id) }}"
+                              style="display:inline;" onsubmit="return confirm('确定要删除此活动吗？');">
+                            <button class="layui-btn layui-btn-danger" type="submit">删除</button>
+                        </form>
+                    </td>
+
+                </tr>
+            {% else %}
+                <li>您尚未创建任何活动。</li>
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+        <h2>我参与的活动</h2>
+
+        <table class="layui-table">
+            <colgroup>
+                <col width="150">
+                <col width="200">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>活动名称</th>
+                <th>活动时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for activity in joined_activities %}
+            <tr>
+                <td>{{ activity.a_name }} </td>
+                <td> {{ to_local_time(activity.event_time).strftime('%Y-%m-%d %H:%M') }}
+                    {% if activity.end_time %}
+                        至 {{ to_local_time(activity.end_time).strftime('%Y-%m-%d %H:%M') }}
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('activity_leave', activity_id=activity.a_id) }}"
+                          style="display:inline;" onsubmit="return confirm('确定要退出此活动吗？');">
+                        <button type="submit" 	class="layui-btn layui-btn-danger">退出</button>
+                    </form>
+                </td>
+
+            </tr>
+
+            </tbody>
+        </table>
+        <ul>
+
+            {% else %}
+                <li>您尚未参与任何活动。</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

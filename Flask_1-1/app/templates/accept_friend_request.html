@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div style="height: 400px;width: 600px;margin: 150px auto ">
+        <h1>申请列表</h1>
+        {% for friend in relationships %}
+            <div style="height: 100px;position: relative;" class="baise mgt8">
+
+                <div style="font-size: 24px;">
+                    {{ friend.friend1.c_usename }}(陌生人)
+                </div>
+                <div style="position: absolute; bottom: 0; right: 0; display: flex; gap: 10px;">
+                    <form method="POST" class="layui-form" action="{{ url_for('friend_request',friend_id= friend.friend1.c_id) }}">
+                        <input type="hidden" name="states" value="1">
+                        <button type="submit" class="layui-btn layui-btn-normal">同意</button>
+                    </form>
+                    <form method="POST" class="layui-form" action="{{ url_for('friend_request',friend_id= friend.friend1.c_id) }}">
+                        <input type="hidden" name="stetes" value="0">
+                        <button type="submit" class="layui-btn layui-btn-warm">忽略</button>
+                    </form>
+                </div>
+            </div>
+
+        {% endfor %}
+        <div style="height: 100px;position: absolute;" class="mgt8">
+        没有更多了
+        </div>
+    </div>
+
+{% endblock %}

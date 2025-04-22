@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="height: 400px;width: 600px;margin: 150px auto ">
+    <h1>个人主页</h1>
+<form method="POST" action="" enctype="multipart/form-data" class="layui-form">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.username.label(class="layui-form-label") }}
+        {{ form.username(size=32,class="layui-input",style="width: 300px;") }}
+        {% for error in form.username.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.email.label(class="layui-form-label") }}
+        {{ form.email(size=32,class="layui-input",style="width: 300px;") }}
+        {% for error in form.email.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.c_avatar.label(class="layui-form-label") }}
+        {{ form.c_avatar(onchange="previewImage(event)",accept="image/*") }}
+        <img id="avatar-preview" src="#" alt="Avatar Preview"  style="display: none; max-width: 100px; max-height: 100px;">
+        {% for error in form.c_avatar.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择兴趣</label>
+        <div class="layui-input-block">
+            {% for tag in tags %}
+                <input type="checkbox" name="selected_tags" value="{{ tag.tag_id }}" title={{ tag.tag_name }}
+                {% if tag.tag_id in hobbies %}checked{% endif %}>
+            {% endfor %}
+        </div>
+      </div>
+    <div class="layui-input-block">
+        {{ form.submit(class="layui-btn") }}
+    </div>
+
+</form>
+<form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('确定要注销账号吗？此操作不可恢复！');" class="layui-form">
+    <div class="layui-input-block" style="margin-top: 10px">
+        <button type="submit" class="layui-btn layui-btn-danger">注销账号</button>
+    </div>
+
+</form>
+</div>
+<script>
+function previewImage(event) {
+    var input = event.target;
+    var reader = new FileReader();
+
+    reader.onload = function(){
+        var img = document.getElementById('avatar-preview');
+        img.src = reader.result;
+        img.style.display = 'block'; // 显示图片
+    }
+
+    if (input.files && input.files[0]) {
+        reader.readAsDataURL(input.files[0]);
+    }
+
+}
+</script>
+{% endblock %}

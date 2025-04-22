@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+    <div style="height: 400px;width: 600px;margin: 150px auto ">
+        <h1>{{ group_chat.g_name }}</h1>
+        <div id="messages">
+            <div id="group-members" style="float: right; width: 20%; border-left: 1px solid #ccc; padding-left: 10px;">
+                <h3>群聊成员</h3>
+                {% for member in members %}
+                    <p>{{ member.c_usename }}</p>
+                {% endfor %}
+            </div>
+            {% for message in messages %}
+                <p class="{% if message.sender_c_id == current_user.c_id %}right{% else %}left{% endif %}">
+                    <strong>{{ message.sender.c_usename }}:</strong> {{ message.chat_content }}
+                    <span class="timestamp">{{ message.chat_date }}</span>
+
+                </p>
+            {% endfor %}
+        </div>
+    <form id="message-form" class="layui-form">
+        <input type="text"  class="layui-input"  id="message" placeholder="输入消息" required>
+        <button type="submit" class="layui-btn layui-btn-normal" >发送</button>
+    </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+	 <script>
+         const socket = io('http://' + document.domain + ':' + location.port, {
+            transports: ['websocket']
+        });
+        socket.on('connect', function() {
+            console.log('SocketIO is connected');
+            socket.emit('join_group_chat', {'group_chat_id': '{{ group_chat.g_id }}'});
+        });
+        socket.on('connect_error', (error) => {
+            console.log('Connection error:', error);
+        });
+        socket.on('new_group_message', function(data) {
+            var messages = document.getElementById('messages');
+            var newMessage = document.createElement('p');
+            newMessage.textContent = data.sender + ': ' + data.content;
+            messages.appendChild(newMessage);
+        });
+        document.getElementById('message-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            console.log('sendMessage');
+            const input = document.getElementById('message');
+            if (input.value) {
+                console.log('Sending message:', input.value);
+                let messageData = {
+                    g_id: '{{ group_chat.g_id }}',
+                    content: input.value
+                };
+
+                socket.emit('send_group_message', messageData);
+                input.value = '';
+            }
+        });
+        {#function sendMessage() {#}
+        {#    var content = document.getElementById('message').value;#}
+        {#    if (content) {#}
+        {#        socket.emit('send_group_message', {'g_id': '{{ group_chat.g_id }}', 'content': content});#}
+        {#        document.getElementById('message').value = '';#}
+        {#    }#}
+        {# } #}
+    </script>
+{% endblock %}

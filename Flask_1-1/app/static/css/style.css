@@ -1,0 +1,324 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul {
+    list-style: none;
+    background-color: #333;
+    padding: 10px;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 10px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    padding: 20px;
+}
+
+.flash-messages {
+    list-style: none;
+    color: red;
+}
+
+h1 {
+    color: #333;
+}
+
+form p {
+    margin: 10px 0;
+}
+
+input, textarea, select {
+    display: block;
+    margin-top: 5px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#messages {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#message-form {
+    display: flex;
+    gap: 10px;
+}
+
+#message-input {
+    flex-grow: 1;
+}
+
+#messages {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 5px;
+    max-width: 70%;
+}
+
+.message.left {
+    background-color: #f1f1f1;
+    float: left;
+    clear: both;
+}
+
+.message.right {
+    background-color: #007bff;
+    color: white;
+    float: right;
+    clear: both;
+}
+
+.timestamp {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 10px;
+}
+
+#messages {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 5px;
+    max-width: 70%;
+}
+
+.message.left {
+    background-color: #f1f1f1;
+    float: left;
+    clear: both;
+}
+
+.message.right {
+    background-color: #007bff;
+    color: white;
+    float: right;
+    clear: both;
+}
+
+.timestamp {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 10px;
+}
+
+.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.flash-messages li {
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f8d7da; /* 默认错误背景 */
+}
+
+.flash-messages li[style*="color: green"] {
+    background-color: #d4edda; /* 成功背景 */
+}
+
+/* 现有样式 */
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 1em;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+}
+
+main {
+    padding: 1em;
+}
+
+#messages {
+    border: 1px solid #ccc;
+    padding: 1em;
+    height: 300px;
+    overflow-y: scroll;
+}
+
+.message {
+    margin: 0.5em 0;
+}
+
+.message.right {
+    text-align: right;
+}
+
+.message .timestamp {
+    font-size: 0.8em;
+    color: #666;
+}
+
+/* 新增 flash 消息样式 */
+.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.flash-messages li {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.flash-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.flash-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+.header {
+    position: fixed; /* 固定在页面顶部 */
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    z-index: 1000; /* 确保头部栏在最上层 */
+}
+.main-content {
+    margin-top: 60px; /* 根据头部栏的实际高度调整 */
+}
+body {
+    margin: 0;
+    height: 100vh;
+    background-color: #eee;
+}
+
+/* *{
+      border: 1px solid black;
+  }*/
+.flex {
+    display: flex;
+}
+
+.baise {
+    background-color: white;
+    box-shadow: rgb(0 0 0 /20%) 0px 2px 1px -1px,
+    rgb(0 0 0 /14%) 0px 1px 1px 0px, rgb(0 0 0/12%) 0px 1px 3px 0px;
+}
+
+.flex1 {
+    flex: 1;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.mg8 {
+    margin: 8px;
+}
+
+.mgr8 {
+    margin-right: 8px;
+}
+
+.mgt8 {
+    margin-top: 8px;
+}
+
+.shadow {
+    box-shadow: rgb(0 0 0 /20%) 0px 2px 1px -1px,
+    rgb(0 0 0 /14%) 0px 1px 1px 0px, rgb(0 0 0/12%) 0px 1px 3px 0px;
+}
+@media screen and (max-width: 768px) {
+    #sidebar {
+        display: none;
+    }
+
+    #toggle-sidebar {
+        display: block;
+    }
+    #right-area {
+        display: none;
+    }
+    #toggle-right-area {
+        display: block;
+    }
+}
+
+#toggle-sidebar {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 999;
+}
+
+#toggle-right-area {
+    display: none;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 999;
+}
+.flash-message {
+    position: fixed;
+    top: 120px; /* 控制弹窗位置，这里设置在顶部 20px 处 */
+    right: 20px; /* 控制弹窗位置，这里设置在右侧 20px 处 */
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+@font-face {
+    font-family: 'CustomFont'; /* 为字体指定一个名称 */
+    src: url('../font/loi.ttf'); /* 指向字体文件的路径 */
+}
+
+/* 应用字体 */
+h1, p ,div{
+    font-family: 'CustomFont', sans-serif; /* 使用自定义字体，如果无法加载则使用系统默认的 sans-serif 字体 */
+}

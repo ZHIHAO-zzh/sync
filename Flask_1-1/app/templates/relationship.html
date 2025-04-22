@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+    <div style="height: 400px;width: 600px;margin: 150px auto ">
+    {% if states == 0 %}
+        <h1>好友列表</h1>
+    {% elif states == 1 %}
+        <h1>搜索</h1>
+    {% endif %}
+
+            <form method="GET" action="{{ url_for('relationship') }}" class="layui-form">
+                <div style="display: flex; align-items: center;">
+                    <i class="layui-icon layui-icon-search" style="font-size: 30px; margin-right: 5px;"></i>
+                    <input type="text" name="f_search" value="{{ search }}" class="layui-input"
+                           placeholder="搜索新朋友">
+                    <button type="submit" class="layui-btn layui-btn-normal">搜索</button>
+                </div>
+
+            </form>
+
+        <ul id="relationship">
+            {% for friend in n_others %}
+                <div style="height: 100px;position: relative;" class="baise mgt8">
+
+                    <div style="font-size: 24px;">
+                        {{ friend.c_usename }}(陌生人)
+                    </div>
+                    <form method="POST" class="layui-form" action="{{ url_for('add_friend_request') }}">
+                        <input type="hidden" name="friend_id" value="{{ friend.c_id }}">
+                        <button type="submit" class="layui-btn layui-btn-normal">申请好友</button>
+                    </form>
+                </div>
+
+            {% endfor %}
+            {% for friend in m_others %}
+                    <div style="height: 100px;position: relative;" class="baise mgt8">
+
+                        <a style="font-size: 24px;" href={{ url_for('friend_chat',other_id=friend.c_id)}}>
+                            {{ friend.c_usename}}(申请未通过)
+                        </a>
+
+                    </div>
+
+            {% endfor %}
+            {% for friend in others %}
+            <div style="height: 100px;position: relative;" class="baise mgt8">
+
+                <a style="font-size: 24px;" href={{ url_for('friend_chat',other_id=friend.c_id)}}>
+                    {{ friend.c_usename}}(好友)
+                </a>
+                <form method="POST" class="layui-form" action="{{ url_for('delete_friend') }}">
+                 <input type="hidden" name="delete" value={{ friend.c_id }}>
+                <button type="submit" style="margin-left: 450px;position: absolute" class="layui-btn layui-btn-danger">
+                    删除好友</button>
+                </form>
+            </div>
+
+            {% endfor %}
+            {% if others is none and m_others is none and n_others is none %}
+            列表为空
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}

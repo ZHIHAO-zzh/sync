@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="height: 400px;width: 600px;margin: 150px auto ">
+    <h1 style="text-align: center;margin-right: 80px ">登录</h1>
+    <form method="POST" action="" class="layui-form">
+        {{ form.hidden_tag() }}
+        <p>{{ form.c_usename.label(class="layui-form-label") }}
+            {{ form.c_usename(size=32,class="layui-input",style="width: 300px;") }}</p>
+        <p>{{ form.password.label(class="layui-form-label") }}
+            {{ form.password(size=32,class="layui-input",style="width: 300px;") }}</p>
+
+        <div class="layui-input-block"><p>{{ form.remember_me() }} {{ form.remember_me.label }}</p></div>
+        <div class="layui-input-block">
+            <p>{{ form.submit(class="layui-btn") }}</p>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

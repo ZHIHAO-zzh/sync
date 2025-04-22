@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="height: 400px;width: 600px;margin: 100px auto ">
+<h1>编辑活动</h1>
+<form method="POST" action="" class="layui-form">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label(class="layui-form-label") }}
+        {{ form.title(size=32,class="layui-input",style="width: 300px;") }}
+        {% for error in form.title.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <label class="layui-form-label">选择标签</label>
+    <div class="layui-input-block">
+        {% for tag in tags %}
+            <input type="checkbox" name="selected_tags" value="{{ tag.tag_id }}" title={{ tag.tag_name }}
+            {% if tag.tag_id in activity_tags %}checked{% endif %}>
+        {% endfor %}
+    </div>
+    <p>
+        {{ form.description.label(class="layui-form-label") }}
+        {{ form.description(rows=5, cols=32,class="layui-textarea") }}
+        {% for error in form.description.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.event_time.label(class="layui-form-label") }}
+        {{ form.event_time(class="layui-input",style="width: 300px;") }}
+        {% for error in form.event_time.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.end_time.label(class="layui-form-label") }}
+        {{ form.end_time(class="layui-input",style="width: 300px;") }}
+        {% for error in form.end_time.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.location.label(class="layui-form-label") }}
+        {{ form.location(class="layui-input",style="width: 300px;") }}
+        {% for error in form.location.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.max_participants.label(class="layui-form-label") }}
+        {{ form.max_participants(class="layui-input",style="width: 300px;") }}
+        {% for error in form.max_participants.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+    </p>
+    <div class="layui-input-block">
+            {{ form.submit(class="layui-btn") }}
+    </div>
+</form>
+</div>
+{% endblock %}
